@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Mã Hóa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-16">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-12">
+            Hệ Thống Mã Hóa Mật Mã Khóa Công Khai
+        </h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- RSA Card -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">RSA</h2>
+                    <p class="text-gray-600 mb-6">
+                        Hệ mật mã khóa công khai RSA với chức năng mã hóa, giải mã và chữ ký số.
+                        Dựa trên bài toán phân tích số nguyên.
+                    </p>
+                    <a href="/rsa"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center font-medium py-2 px-4 rounded-lg transition duration-200">
+                        Sử dụng RSA
+                    </a>
+                </div>
+            </div>
+
+            <!-- ElGamal Card -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">ElGamal</h2>
+                    <p class="text-gray-600 mb-6">
+                        Hệ mật mã ElGamal dựa trên bài toán logarit rời rạc.
+                        Hỗ trợ mã hóa, giải mã và chữ ký số.
+                    </p>
+                    <a href="/elgamal"
+                        class="block w-full bg-green-500 hover:bg-green-600 text-white text-center font-medium py-2 px-4 rounded-lg transition duration-200">
+                        Sử dụng ElGamal
+                    </a>
+                </div>
+            </div>
+
+            <!-- ECC Card -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                <div class="p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">ECC</h2>
+                    <p class="text-gray-600 mb-6">
+                        Mã hóa đường cong Elliptic với độ an toàn cao và khóa ngắn.
+                        Dựa trên bài toán logarit rời rạc trên đường cong Elliptic.
+                    </p>
+                    <a href="/ecc"
+                        class="block w-full bg-purple-500 hover:bg-purple-600 text-white text-center font-medium py-2 px-4 rounded-lg transition duration-200">
+                        Sử dụng ECC
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-12 text-gray-600">
+            <h2 class="text-xl">Môn học Mật mã và An toàn thông tin</h2>
+            <p class="mt-2">Đại học Công nghệ - Đại học Quốc gia Hà Nội</p>
+            <p class="mt-2">Nguyễn Quang Minh - 22024547</p>
+            <p class="mt-2">Nguyễn Trung Nguyên - 22024553</p>
+            <footer class="mt-2">Lưu ý: Các thuật toán sau giới hạn thời gian chạy trong 30 phút.</footer>
+        </div>
+    </div>
+</body>
+
+</html>
