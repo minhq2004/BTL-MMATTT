@@ -134,11 +134,6 @@
 
                 clearTimeout(timeoutId);
 
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('Server không trả về dữ liệu JSON hợp lệ');
-                }
-
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Có lỗi xảy ra khi xử lý');
