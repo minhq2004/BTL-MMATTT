@@ -59,34 +59,39 @@ def ec_elgamal_decrypt(curve, private_key, ciphertext):
     return plaintext_point
 
 def elliptic_sign(curve, private_key, message):
-    z = int(hashlib.sha512(message.encode()).hexdigest(), 16)
-    r = 0
-    s = 0
-    while r == 0 or s == 0 or math.gcd(s, curve.n) != 1:
-        k = random.randint(1, curve.n - 1)
-        while math.gcd(k, curve.n) != 1:
-            k = random.randint(1, curve.n - 1)
-        x, y = curve.scalar_multiplication(k, curve.G)
-        r = x % curve.n
-        s = ((z + r * private_key) * pow(k, -1, curve.n)) % curve.n
+    h = int(hashlib.sha512(message.encode()).hexdigest(), 16) % curve.n
+    while True:
+        k = random.randint(1, curve.n-1)
+        point = k * curve.G
+        x1 = point[0]
+        r = x1 % curve.n
+        
+        if r == 0:
+            continue
+            
+        k_inv = pow(k, -1, curve.n)
+        s = (k_inv * (h + private_key*r)) % curve.n
+        
         if s == 0:
             continue
-        
-    return (r, s)
+            
+        return (r, s)
 
 def elliptic_verify(curve, public_key, message, signature):
     r, s = signature
+    
     if not (1 <= r < curve.n and 1 <= s < curve.n):
         return False
-    z = int(hashlib.sha512(message.encode()).hexdigest(), 16)
+        
     w = pow(s, -1, curve.n)
-    u1 = (z * w) % curve.n
+    h = int(hashlib.sha512(message.encode()).hexdigest(), 16) % curve.n
+    u1 = (h * w) % curve.n
     u2 = (r * w) % curve.n
-    x, y = curve.point_addition(
-        curve.scalar_multiplication(u1, curve.G),
-        curve.scalar_multiplication(u2, public_key)
-    )
-    return r == x % curve.n
+    point = u1*curve.G + u2*public_key
+    x0 = point[0]
+    v = x0 % curve.n
+    
+    return v == r
 
 
 def hash_message_to_point(curve, message):
@@ -98,3 +103,4 @@ def hash_message_to_point(curve, message):
             y = pow(y2, (curve.p + 1) // 4, curve.p)
             return (x, y)
         x = (x + 1) % curve.p
+        
