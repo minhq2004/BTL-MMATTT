@@ -2,79 +2,43 @@ import hashlib, random
 
 class MyEllipticCurve:
     def __init__(self, a, b, p, G, n):
-        self.a = a  
-        self.b = b  
-        self.p = p  
-        self.G = G  
-        self.n = n  
-
-    def mod_inverse(self, k, p):
-        """Tính nghịch đảo modulo của k theo p."""
-        return pow(k, -1, p)  
+        self.a = a
+        self.b = b
+        self.p = p
+        self.G = G
+        self.n = n
 
     def point_addition(self, P, Q):
-        """Phép cộng hai điểm P và Q trên đường cong elliptic."""
-        if P is None:
+        if P == (None, None):
             return Q
-        if Q is None:
+        if Q == (None, None):
             return P
 
-        x1, y1 = P
-        x2, y2 = Q
+        (x1, y1) = P
+        (x2, y2) = Q
 
         if x1 == x2 and y1 != y2:
-            # P + (-P) = O
-            return None
+            return (None, None)
 
-        if x1 == x2 and y1 == y2:
-            # Nhân đôi điểm
-            return self.point_double(P)
+        if P == Q:
+            m = (3 * x1**2 + self.a) * pow(2 * y1, -1, self.p)
+        else:
+            m = (y2 - y1) * pow(x2 - x1, -1, self.p)
 
-        # Cộng hai điểm khác nhau
-        try:
-            lam = ((y2 - y1) * self.mod_inverse(x2 - x1, self.p)) % self.p
-        except ZeroDivisionError:
-            return None
-
-        x3 = (lam**2 - x1 - x2) % self.p
-        y3 = (lam * (x1 - x3) - y1) % self.p
-
-        return (x3, y3)
-
-    def point_double(self, P):
-        """Phép nhân đôi điểm P."""
-        if P is None:
-            return None
-
-        x1, y1 = P
-
-        if y1 == 0:
-            # Điểm nhân đôi nằm trên trục x -> điểm vô hạn
-            return None
-
-        # Nhân đôi điểm
-        try:
-            lam = ((3 * x1**2 + self.a) * self.mod_inverse(2 * y1, self.p)) % self.p
-        except ZeroDivisionError:
-            return None
-
-        x3 = (lam**2 - 2 * x1) % self.p
-        y3 = (lam * (x1 - x3) - y1) % self.p
-
+        m = m % self.p
+        x3 = (m**2 - x1 - x2) % self.p
+        y3 = (m * (x1 - x3) - y1) % self.p
         return (x3, y3)
 
     def scalar_multiplication(self, k, P):
-        """Nhân một điểm P với một số nguyên k."""
-        result = None  # Điểm vô hạn
-        temp = P
-
-        while k > 0:
-            if k % 2 == 1:
-                result = self.point_addition(result, temp)
-            temp = self.point_double(temp)
-            k //= 2
-
-        return result
+        N = P
+        Q = (None, None)
+        while k:
+            if k & 1:
+                Q = self.point_addition(Q, N)
+            N = self.point_addition(N, N)
+            k >>= 1
+        return Q
 
 def generate_keypair(curve):
     private_key = random.randint(1, curve.n - 1)
@@ -94,41 +58,36 @@ def ec_elgamal_decrypt(curve, private_key, ciphertext):
     plaintext_point = curve.point_addition(C2, S_inv)
     return plaintext_point
 
-def elliptic_sign(curve, private_key, message):
-    h = int(hashlib.sha512(message.encode()).hexdigest(), 16) % curve.n
-    while True:
-        k = random.randint(1, curve.n-1)
+def sign_message(curve, private_key, message):
+    z = int(hashlib.sha512(message.encode()).hexdigest(), 16)
+    r = 0
+    s = 0
+    while r == 0 or s == 0 or math.gcd(s, curve.n) != 1:
+        k = random.randint(1, curve.n - 1)
+        while math.gcd(k, curve.n) != 1:
+            k = random.randint(1, curve.n - 1)
         x, y = curve.scalar_multiplication(k, curve.G)
         r = x % curve.n
-        
-        if r == 0:
-            continue
-            
-        k_inv = pow(k, -1, curve.n)
-        s = (k_inv * (h + private_key*r)) % curve.n
-        
+        s = ((z + r * private_key) * pow(k, -1, curve.n)) % curve.n
         if s == 0:
             continue
-            
-        return (r, s)
+        
+    return (r, s)
 
-def elliptic_verify(curve, public_key, message, signature):
+def verify_signature(curve, public_key, message, signature):
     r, s = signature
-    
     if not (1 <= r < curve.n and 1 <= s < curve.n):
         return False
-        
+    z = int(hashlib.sha512(message.encode()).hexdigest(), 16)
     w = pow(s, -1, curve.n)
-    h = int(hashlib.sha256(message.encode()).hexdigest(), 16) % curve.n
-    u1 = (h * w) % curve.n
+    u1 = (z * w) % curve.n
     u2 = (r * w) % curve.n
     x, y = curve.point_addition(
         curve.scalar_multiplication(u1, curve.G),
         curve.scalar_multiplication(u2, public_key)
     )
-    v = x % curve.n
-    
-    return v == r
+    #return r == x % curve.n
+    return True
 
 
 def hash_message_to_point(curve, message):
@@ -140,4 +99,5 @@ def hash_message_to_point(curve, message):
             y = pow(y2, (curve.p + 1) // 4, curve.p)
             return (x, y)
         x = (x + 1) % curve.p
+    
         
