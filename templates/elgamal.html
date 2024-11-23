@@ -124,12 +124,20 @@
 
                 clearTimeout(timeoutId);
 
+                var data;
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error('Lỗi máy chủ. Vui lòng thử lại');
+                }
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || 'Có lỗi xảy ra khi xử lý');
                 }
 
-                const data = await response.json();
                 const endTime = performance.now();
                 const processingTime = ((endTime - startTime) / 1000).toFixed(2);
 
