@@ -1,3 +1,4 @@
+import math
 import hashlib, random
 
 class MyEllipticCurve:
@@ -58,7 +59,7 @@ def ec_elgamal_decrypt(curve, private_key, ciphertext):
     plaintext_point = curve.point_addition(C2, S_inv)
     return plaintext_point
 
-def sign_message(curve, private_key, message):
+def elliptic_sign(curve, private_key, message):
     z = int(hashlib.sha512(message.encode()).hexdigest(), 16)
     r = 0
     s = 0
@@ -74,7 +75,7 @@ def sign_message(curve, private_key, message):
         
     return (r, s)
 
-def verify_signature(curve, public_key, message, signature):
+def elliptic_verify(curve, public_key, message, signature):
     r, s = signature
     if not (1 <= r < curve.n and 1 <= s < curve.n):
         return False
