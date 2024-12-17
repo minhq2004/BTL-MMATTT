@@ -9,7 +9,7 @@ Giao diện ứng dụng mật mã cho môn học Mật mã và An toàn thông 
 ## Features
 
 - Mã hóa và chữ ký số các hệ mật RSA, Elgamal, ECC bằng cách nhập số bit của tham số và tin nhắn.
-- Giới hạn thời gian xử lý trong 30 phút.
+- Giới hạn thời gian xử lý trong 30 giờ.
 - Sử dụng thuật toán Schoof–Elkies–Atkin (SEA) tìm số điểm trên đường cong và AKS để kiểm tra số nguyên tố.
 
 ## Authors
