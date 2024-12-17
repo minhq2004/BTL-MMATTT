@@ -87,9 +87,7 @@ def elliptic_verify(curve, public_key, message, signature):
         curve.scalar_multiplication(u1, curve.G),
         curve.scalar_multiplication(u2, public_key)
     )
-    #return r == x % curve.n
-    return True
-
+    return r == x % curve.n
 
 def hash_message_to_point(curve, message):
     hash_int = int(hashlib.sha512(message.encode()).hexdigest(), 16)

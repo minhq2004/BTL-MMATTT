@@ -13,32 +13,6 @@ app = Flask(__name__)
 # Tăng giới hạn số
 sys.set_int_max_str_digits(10000)
 
-def miller_rabin(n, k=10):
-    """Miller-Rabin kiểm tra số nguyên tố (nhanh)"""
-    if n == 2 or n == 3:
-        return True
-    if n < 2 or n % 2 == 0:
-        return False
-
-    r = 0
-    d = n - 1
-    while d % 2 == 0:
-        r += 1
-        d //= 2
-
-    for _ in range(k):
-        a = random.randrange(2, n - 1)
-        x = pow(a, d, n)
-        if x == 1 or x == n - 1:
-            continue
-        for _ in range(r - 1):
-            x = pow(x, 2, n)
-            if x == n - 1:
-                break
-        else:
-            return False
-    return True
-
 def generate_prime_candidate(n):
     """Sinh số ngẫu nhiên n-bit"""
     return random.randrange(2**(n-1) + 1, 2**n - 1) | 1
@@ -47,16 +21,8 @@ def generate_n_bit_prime(n):
     """Sinh số nguyên tố n-bit sử dụng Miller-Rabin và xác minh bằng AKS"""
     while True:
         candidate = generate_prime_candidate(n)
-        # Dùng Miller-Rabin trước vì nhanh
-        if miller_rabin(candidate, k=10):
-            # Xác minh lại bằng AKS nếu số không quá lớn
-            if n <= 256:  # Giới hạn AKS cho số nhỏ
-                if aks_primality_test(candidate):
-                    return candidate
-            else:
-                # Với số lớn, tin tưởng Miller-Rabin với k cao hơn
-                if miller_rabin(candidate, k=20):
-                    return candidate
+        if aks_primality_test(candidate):
+            return candidate
 
 def generate_different_primes(n):
     """Sinh hai số nguyên tố khác nhau"""
